@@ -72,38 +72,34 @@ app.get("/compose" , function (req,res){
 
 app.post("/compose" , function ( req, res) {
 
+  const post = {
+    title: req.body.postTitle,
+    content: req.body.postContent
+  };
+  
+  posts.push(post)
+  res.redirect("/");
 
-   const post = new Posts ({
-    title : req.body.postTitle ,
-    content : req.body.postContent
-   })
-
-   post.save(function(err){
-    if (!err){
-      res.redirect("/");
-    } else {
-      console.log(err)
-    }
-   })
 });
 
-
-// express route parameters 
-app.get("/posts/:postId" , function (req, res) {
-  const requestedId = (req.params.postId);
+app.get("/posts/:postName" , function (req, res) {
   
-  Posts.findOne({_id: requestedId}, function(err, post){
-    if (!err) {
-      res.render("post", {
+  posts.forEach(function(post) {
+    let check = posts.some(checkPosts => 
+      _.lowerCase(checkPosts.title) === _.lowerCase(req.params.postName));
+
+    if ( check === true) {
+      res.render("post" , {
         title: post.title,
         content: post.content
       });
+
     } else {
       res.render("error");
     }
-    
   });
-})
+
+});
 
 
 app.listen(process.env.PORT || 3000, function() {
